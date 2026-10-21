@@ -5,8 +5,12 @@
 #define DEV_INFO "Developed By: Message Beast (Melikt belay)\n"
 
 
-
+#define VERSION_INFO "MBUILD is in version: %s\n"
 
 void displayHelp() {
     printf("MBUILD\nVERSION: %s\n%s%s%s", __MBUILD_VERSION__, HEADER, USAGE, DEV_INFO);
+}
+
+void displayVersion() {
+    printf(VERSION_INFO, __MBUILD_VERSION__);
 }
