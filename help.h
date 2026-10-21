@@ -1,1 +1,2 @@
 void displayHelp();
+void displayVersion();

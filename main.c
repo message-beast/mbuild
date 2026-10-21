@@ -37,6 +37,10 @@ int main(int argc, char** argv) {
         displayHelp();
         return 0;
     }
+    if (__builtin_expect(strcmp(arg1, "--version") == 0 || strcmp(arg1, "-v") == 0, 0)) {
+        displayVersion();
+        return 0;
+    }
     if (__builtin_expect(buildFileflag != 0, 0)) exit_program(-1);
     if (__builtin_expect(runTarget(execs, arg1) != 0, 0)) return 1;
     return 0;
