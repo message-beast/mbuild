@@ -13,7 +13,7 @@ void __attribute__((noreturn)) panic(int i) {
 __attribute__((hot, aligned(64), reproducible)) void freeMExecs(mexec** execs) {
     if (__builtin_expect(execs == NULL, 0)) return;
     mexec* exec = *execs;
-    while (exec != NULL) {
+    for (;exec != NULL;) {
         for (register int i = 0; i < exec->argsNumber; ++i) {
             free(exec->commands[i]);
         }

@@ -51,10 +51,11 @@ static inline __attribute__((always_inline, hot, aligned(64))) int run(mexec* ex
 
 __attribute__((hot, aligned(64))) int runTarget(mexec* __restrict__ execs, char* __restrict__ target) {
     mexec* exec = execs;
-    while (exec != NULL) {
-        if (__builtin_expect(strcmp(execs->target, target) == 0, 0)) {
+    for (;exec != NULL;) {
+        printf("comparing: %s vs %s\n", exec->target, target);
+        if (__builtin_expect(strcmp(exec->target, target) == 0, 0)) {
             return run(exec);
-        };
+        }
         exec = exec->next;
     }
     fprintf(stderr, "failed to find any target with name %s\n", target);
