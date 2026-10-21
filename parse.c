@@ -12,7 +12,7 @@
 
 DECLARE_GIVE_STR
 
-static inline __attribute__((always_inline, hot, aligned(64))) mexec* parseContent(char* content, size_t len) {
+static inline __attribute__((always_inline, hot, aligned(64), artificial)) mexec* parseContent(char* content, size_t len) {
     mexec* newExec = malloc(sizeof(mexec));
     if (__builtin_expect(newExec == NULL, 0)) return NULL;
     char** commands = malloc(sizeof(char*) * __INITIAL_ARGS_CAPACITY);
@@ -31,7 +31,8 @@ static inline __attribute__((always_inline, hot, aligned(64))) mexec* parseConte
             lastIndex = i + 1;
         }
     }
-    newExec->next = NULL;
+    newExec->commands[found++] = NULL;
+    newExec->argsNumber = found;
     return newExec;
     fail:
         free(newExec);
@@ -41,15 +42,17 @@ static inline __attribute__((always_inline, hot, aligned(64))) mexec* parseConte
 
 
 
-__attribute__((hot)) mexec** parseFile() {
+__attribute__((hot)) mexec* parseFile() {
     int fd = open(__DEFAULT_BUILD_FILE, O_RDONLY);
     if (__builtin_expect(fd == -1, 0)) {
         if (errno == EACCES) {
             fprintf(stderr, "permission denied!\n");
+            buildFileflag = 1;
         } else {
-            perror("error happend!\n");
+            perror("can't open build file\n");
+            buildFileflag = 1;
         }
-        exit_program(-1);
+        return NULL;
     }
     struct stat st;
     if (__builtin_expect(fstat(fd, &st) != 0, 0)) {
@@ -61,23 +64,20 @@ __attribute__((hot)) mexec** parseFile() {
         perror("mmap failed on build file!\n");
         exit_program(-1);
     }
-    char* content = NULL;
     int cmdlastIndex = 0;
     int nameLastIndex = 0;
     char* name = NULL;
-    mexec* mexecss = (malloc(sizeof(mexec)));
-    mexec** mexecs = &(mexecss);
-    if (__builtin_expect(mexecs == NULL, 0)) goto fail;
+    mexec* mexecs = NULL;
     enum {FIND_SECTION, FIND_END} state = FIND_SECTION;
-    int found = 0;
     for (register int i = 0; i < st.st_size; ++i) {
         switch(state) {
             case FIND_SECTION:
                 if (__builtin_expect(data[i] == ':', 0)) {
+                    i++;
                     cmdlastIndex = i + 2;
                     state = FIND_END;
-                    char* tmpName = giveString(data, nameLastIndex, i);
-                    if (__builtin_expect(name == NULL, 0)) goto fail;
+                    char* tmpName = giveString(data, nameLastIndex, i - 1);
+                    if (__builtin_expect(tmpName == NULL, 0)) goto fail;
                     name = tmpName;
                 };
                 break;
@@ -91,8 +91,8 @@ __attribute__((hot)) mexec** parseFile() {
                         goto crash;
                     };
                     newExec->target = name;
-                    mexec* before = (*mexecs);
-                    (*mexecs) = newExec;
+                    mexec* before = mexecs;
+                    mexecs = newExec;
                     newExec->next = before;
                     free(command);
                     state = FIND_SECTION;
@@ -110,5 +110,6 @@ __attribute__((hot)) mexec** parseFile() {
         free(name);
         munmap(data, st.st_size);
         close(fd);
+        printf("crashed!\n");
         exit_program(-1);
 }

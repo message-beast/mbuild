@@ -14,8 +14,9 @@
 #include "utils.h"
 
 static inline __attribute__((always_inline, hot, aligned(64))) int run(mexec* exec) {
-    int fd = shm_open(SHM_NAME, O_RDWR, 0644);
+    int fd = shm_open(SHM_NAME, O_RDWR | O_CREAT, 0644);
     if (__builtin_expect(fd == -1, 0)) exit_program(-1);
+    if (__builtin_expect(ftruncate(fd, 2) != 0, 0)) exit_program(-1);
     char* statusBuff = mmap(NULL, 2, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (__builtin_expect(statusBuff == MAP_FAILED, 0)) exit_program(-1);
     pid_t pid = fork();
@@ -35,10 +36,13 @@ static inline __attribute__((always_inline, hot, aligned(64))) int run(mexec* ex
         }
         if (__builtin_expect(strcmp(statusBuff, "0") != 0, 0)) goto cleanup;
     }
+    munmap(statusBuff, 2);
+    shm_unlink(SHM_NAME);
     return 0;
     cleanup:
         munmap(statusBuff, 2);
         shm_unlink(SHM_NAME);
+        printf("failed to run it!\n");
         return -1;
 
 }
@@ -51,6 +55,7 @@ __attribute__((hot, aligned(64))) int runTarget(mexec* __restrict__ execs, char*
         if (__builtin_expect(strcmp(execs->target, target) == 0, 0)) {
             return run(exec);
         };
+        exec = exec->next;
     }
     fprintf(stderr, "failed to find any target with name %s\n", target);
     return -1;

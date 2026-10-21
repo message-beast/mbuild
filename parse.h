@@ -1,2 +1,2 @@
 #include "basic.h"
-__attribute__((hot)) mexec** parseFile();
+__attribute__((hot)) mexec* parseFile();

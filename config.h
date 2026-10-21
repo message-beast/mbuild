@@ -1,3 +1,6 @@
 #define __DEFAULT_BUILD_FILE "Mbuildfile"
 #define __INITIAL_ARGS_CAPACITY 30
 #define __INITIAL_EXECS_CAPACITY 30
+#define __MBUILD_VERSION__ "1.0.0"
+
+extern volatile int buildFileflag;
