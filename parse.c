@@ -10,6 +10,18 @@
 #include <errno.h>
 #include "utils.h"
 
+#define resize_commands \
+if (__builtin_expect(found + 1 >= newExec->argsCapacity, 0)) {\
+    int newSize = newExec->argsCapacity + (__INITIAL_ARGS_CAPACITY * sizeof(char*));\
+    char** tmp = realloc(newExec->commands, newSize);\
+    if (__builtin_expect(tmp == NULL, 0)) {\
+        perror("reallocation of commands failed! (mbuild internal error)\n");\
+        exit_program(1);\
+    }\
+    newExec->commands = tmp;\
+}\
+
+
 DECLARE_GIVE_STR
 
 static inline __attribute__((always_inline, hot, aligned(64), artificial)) mexec* parseContent(char* content, size_t len) {
@@ -25,7 +37,14 @@ static inline __attribute__((always_inline, hot, aligned(64), artificial)) mexec
     if (__builtin_expect(newExec == NULL, 0)) return NULL;
     for (register int i = 0; i < len; ++i) {
         if (__builtin_expect(content[i] == ' ', 0)) {
+            resize_commands
             char* newArg = giveString(content, lastIndex, i);
+            if (__builtin_expect(newArg == NULL, 0)) exit_program(-1);
+            newExec->commands[found++] = newArg;
+            lastIndex = i + 1;
+        } else if (__builtin_expect(len == i + 1, 0)) {
+            resize_commands
+            char* newArg = giveString(content, lastIndex, i + 1);
             if (__builtin_expect(newArg == NULL, 0)) exit_program(-1);
             newExec->commands[found++] = newArg;
             lastIndex = i + 1;
