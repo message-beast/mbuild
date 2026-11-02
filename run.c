@@ -42,7 +42,7 @@ static inline __attribute__((always_inline, hot, aligned(64))) int run(mexec* ex
     cleanup:
         munmap(statusBuff, 2);
         shm_unlink(SHM_NAME);
-        printf("failed to run it!\n");
+        printf("failed to run taregt \"%s\"\n", exec->target);
         return -1;
 
 }

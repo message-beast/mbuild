@@ -25,6 +25,13 @@ but don't forget to insert new line at the end the build file
 
 
 ### installation
+-> make sure you clone the repo
+
+```bash
+    git clone https://github.com/message-beast/mbuild
+    cd mbuild
+
+```
 ```bash
     sudo make compile
 ```
