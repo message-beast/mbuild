@@ -9,6 +9,13 @@ list-files:
     ls -la
     
 ``` 
+* If you want to use groups just do the target name and put your arrays of targets in [] but even the last one must contain **','** infront of it and there is no space allowed between members of your group array, And this target runs the target of its own Mbuildfile file not other targets of Mbuildfile files in other directories!
+
+```
+build-kernel:
+  [compile-kernel,compile-some-other-so,compile-syscalls,]
+```
+
 but don't forget to insert new line at the end the build file
 
 * you must create the build file in your working directory called "Mbuildfile"
