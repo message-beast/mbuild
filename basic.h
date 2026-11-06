@@ -6,3 +6,12 @@ typedef struct mexec {
     int argsNumber;
     int argsCapacity;
 } mexec;
+
+
+typedef struct groupexec {
+    char** targets;
+    char* name;
+    struct groupexec* next;
+    int numbers;
+    int capacity;
+} groupexec;

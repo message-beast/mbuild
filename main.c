@@ -21,6 +21,7 @@ __attribute__((constructor, no_reorder)) void initSystem() {
 
 __attribute__((destructor, no_reorder)) void closeSystem() {
     freeMExecs(&execs);
+    freeGroupExecs(&groupexecs);
 }
 
 
@@ -42,6 +43,6 @@ int main(int argc, char** argv) {
         return 0;
     }
     if (__builtin_expect(buildFileflag != 0, 0)) exit_program(-1);
-    if (__builtin_expect(runTarget(execs, arg1) != 0, 0)) return 1;
+    if (__builtin_expect(runTarget(execs, groupexecs, arg1) != 0, 0)) return 1;
     return 0;
 }

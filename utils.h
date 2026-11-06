@@ -15,3 +15,4 @@ void __attribute__((noreturn)) panic(int i);
 
 
 __attribute__((hot, aligned(64))) void freeMExecs(mexec** execs);
+__attribute__((hot, aligned(64), reproducible)) void freeGroupExecs(groupexec** groupexecs);

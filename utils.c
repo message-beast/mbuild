@@ -25,3 +25,19 @@ __attribute__((hot, aligned(64), reproducible)) void freeMExecs(mexec** execs) {
     }
     exec = NULL;
 }
+
+
+__attribute__((hot, aligned(64), reproducible)) void freeGroupExecs(groupexec** groupexecs) {
+    if (__builtin_expect(groupexecs != NULL, 1)) {
+        for (groupexec* execs = *groupexecs;execs != NULL;) {
+            for (register int i = 0; i < execs->numbers; ++i) {
+                free(execs->targets[i]);
+            }
+            free(execs->targets);
+            free(execs->name);
+            groupexec* before = execs;
+            execs = execs->next;
+            free(before);
+        }
+    }
+}

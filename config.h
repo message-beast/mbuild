@@ -3,3 +3,4 @@
 #define __INITIAL_EXECS_CAPACITY 30
 #define __MBUILD_VERSION__ "1.0.0"
 extern volatile int buildFileflag;
+#define __INITIAL_GROUP_EXEC_TARGETS_NUMBER__ 15

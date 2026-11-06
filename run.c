@@ -49,13 +49,24 @@ static inline __attribute__((always_inline, hot, aligned(64))) int run(mexec* ex
 
 
 
-__attribute__((hot, aligned(64))) int runTarget(mexec* __restrict__ execs, char* __restrict__ target) {
+__attribute__((hot, aligned(64), nonnull(1, 2))) int runTarget(mexec* __restrict__ execs, groupexec* __restrict__ gexec, char* __restrict__ target) {
     mexec* exec = execs;
     for (;exec != NULL;) {
         if (__builtin_expect(strcmp(exec->target, target) == 0, 0)) {
             return run(exec);
         }
         exec = exec->next;
+    }
+    for (groupexec* gexecs = gexec; gexecs != NULL; gexecs = gexecs->next) {
+        if (__builtin_expect(strcmp(gexecs->name, target) == 0, 0)) {
+            for (register int i = 0; i < gexecs->numbers; ++i) {
+                if (__builtin_expect(runTarget(execs, gexec, gexecs->targets[i]) != 0, 0)) {
+                    fprintf(stderr, "failed to run a group, failed on %s\n", gexecs->targets[i]);
+                    exit_program(-1);
+                }
+            }
+            return 0;
+        }
     }
     fprintf(stderr, "failed to find any target with name %s\n", target);
     return -1;
