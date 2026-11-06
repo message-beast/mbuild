@@ -115,12 +115,10 @@ static inline __attribute__((always_inline, artificial, hot, aligned(64), nonnul
 __attribute__((hot)) mexec* parseFile() {
     int fd = open(__DEFAULT_BUILD_FILE, O_RDONLY);
     if (__builtin_expect(fd == -1, 0)) {
-        if (errno == EACCES) {
-            fprintf(stderr, "permission denied!\n");
+        if (__builtin_expect(errno == ENOENT, 1)) {
             buildFileflag = 1;
         } else {
             perror("can't open build file\n");
-            buildFileflag = 1;
         }
         return NULL;
     }

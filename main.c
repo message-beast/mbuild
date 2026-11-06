@@ -13,8 +13,6 @@ __attribute__((constructor, no_reorder)) void initSystem() {
     if (__builtin_expect(mexecs == NULL && buildFileflag == 0, 0)) exit_program(-1);
     if (__builtin_expect(mexecs != NULL, 1)) {
         execs = mexecs;
-    } else {
-        exit_program(-1);
     }
 }
 
@@ -42,7 +40,10 @@ int main(int argc, char** argv) {
         displayVersion();
         return 0;
     }
-    if (__builtin_expect(buildFileflag != 0, 0)) exit_program(-1);
+    if (__builtin_expect(buildFileflag != 0, 0)) goto giveError;
     if (__builtin_expect(runTarget(execs, groupexecs, arg1) != 0, 0)) return 1;
     return 0;
+    giveError:
+        perror("there is no Mbuildfile are you crazy????\n");
+        exit_program(-1);
 }
