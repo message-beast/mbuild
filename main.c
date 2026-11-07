@@ -32,6 +32,10 @@ __attribute__((destructor, no_reorder)) void closeSystem() {
 
 int main(int argc, char** argv) {
     char* arg1 = argv[1];
+    if (__builtin_expect(arg1 == NULL, 0)) {
+        fprintf(stderr, "please give at least 1 argument!\n");
+        return 1;
+    }
     if (__builtin_expect(strcmp(arg1, "--help") == 0 || strcmp(arg1, "-h") == 0, 0)) {
         displayHelp();
         return 0;
