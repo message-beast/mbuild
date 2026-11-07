@@ -69,6 +69,10 @@ static inline __attribute__((always_inline, hot, aligned(64), artificial)) mexec
 
 
 static inline __attribute__((always_inline, artificial, hot, aligned(64), nonnull(1, 2))) struct groupexec* parseNewGroupExec(char* __restrict__ name, char* groupexecBuff, int len) {
+    if (__builtin_expect(groupexecBuff[len - 1] != ',', 0)) {
+        fprintf(stderr, "you forgot to insert ',' at the end on your group target: %s", name);
+        return NULL;
+    }
     register int lastIndex = 0;
     groupexec* newGroupexec = malloc(sizeof(groupexec));
     if (__builtin_expect(newGroupexec == NULL, 0)) {
@@ -131,6 +135,10 @@ __attribute__((hot)) mexec* parseFile() {
     if (__builtin_expect(data == MAP_FAILED, 0)) {
         perror("mmap failed on build file!\n");
         exit_program(-1);
+    }
+    if (__builtin_expect(data[st.st_size - 1] != '\n', 0)) {
+        fprintf(stderr, "you forgot to insert new line at the end of the build file!\n");
+        goto fail;
     }
     int cmdlastIndex = 0;
     int nameLastIndex = 0;
