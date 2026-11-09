@@ -16,6 +16,18 @@ build-kernel:
   [compile-kernel,compile-some-other-so,compile-syscalls,]
 ```
 
+* Mbuild also supports nested builds, so you gotta create Mbuildallfile file like the following syntax and run ```mbuild :all:``` 
+```
+{
+  wd: Desktop/my_cool_project;
+  target: compile_necessary;
+}
+{
+  wd: Desktop/my_cool_project_final;
+  target: compile_polish;
+}
+```
+
 but don't forget to insert new line at the end the build file
 
 * you must create the build file in your working directory called "Mbuildfile"
