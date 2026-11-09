@@ -129,11 +129,17 @@ __attribute__((hot)) mexec* parseFile() {
     struct stat st;
     if (__builtin_expect(fstat(fd, &st) != 0, 0)) {
         perror("fstat failed on build file!\n");
+        close(fd);
+        exit_program(-1);
+    }
+    if (__builtin_expect(st.st_size == 0, 0)) {
+        fprintf(stderr, "Mbuildfile has no content!\n");
         exit_program(-1);
     }
     char* data = mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
     if (__builtin_expect(data == MAP_FAILED, 0)) {
         perror("mmap failed on build file!\n");
+        close(fd);
         exit_program(-1);
     }
     if (__builtin_expect(data[st.st_size - 1] != '\n', 0)) {

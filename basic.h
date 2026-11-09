@@ -15,3 +15,9 @@ typedef struct groupexec {
     int numbers;
     int capacity;
 } groupexec;
+
+
+typedef struct mall {
+    char* directory;
+    char* target;
+} mall;

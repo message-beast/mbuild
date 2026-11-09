@@ -31,7 +31,7 @@ static inline __attribute__((always_inline, hot, aligned(64))) int run(mexec* ex
         int status;
         waitpid(pid, &status, 0);
         if (__builtin_expect(WEXITSTATUS(status) != 0, 0)) {
-            perror("child failed!\n");
+            fprintf(stderr, "\033[31mprocess failed with status %i\033[0m\n", status);
             goto cleanup;
         }
         if (__builtin_expect(strcmp(statusBuff, "0") != 0, 0)) goto cleanup;

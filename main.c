@@ -5,6 +5,7 @@
 #include "help.h"
 #include "run.h"
 #include "config.h"
+#include "mall_utils.h"
 __attribute__((section(".data"))) mexec* execs = NULL;
 
 
@@ -44,8 +45,11 @@ int main(int argc, char** argv) {
         displayVersion();
         return 0;
     }
+    if (__builtin_expect(strcmp(arg1, ":all:") == 0, 0)) {
+        return do_everything_Dmall();
+    }
     if (__builtin_expect(buildFileflag != 0, 0)) goto giveError;
-    if (__builtin_expect(runTarget(execs, groupexecs, arg1) != 0, 0)) return 1;
+    if (__builtin_expect(runTarget(execs, groupexecs, arg1) != 0, 0)) return -1;
     return 0;
     giveError:
         perror("there is no Mbuildfile are you crazy????\n");
