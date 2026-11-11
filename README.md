@@ -44,15 +44,25 @@ but don't forget to insert new line at the end the build file
 
 
 ### installation
--> make sure you clone the repo
+-> Feroda linux or RPM package
+```bash
+#enable copr to mbuild
+sudo dnf copr enable message-beast/mbuild
+#install mbuild
+sudo dnf install mbuild
+```
+-> manual way?
+
+* make sure you clone the repo
 
 ```bash
-    git clone https://github.com/message-beast/mbuild
-    cd mbuild
-
+#clone the repo
+git clone https://github.com/message-beast/mbuild
+cd mbuild
 ```
 ```bash
-    sudo make compile
+#install it
+sudo make compile
 ```
 
 #### more info?
