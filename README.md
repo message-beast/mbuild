@@ -39,12 +39,12 @@ but don't forget to insert new line at the end the build file
 
 -> libc
 
--> glibc malloc memory grabing size at least
+-> glibc malloc memory grabbing size at least
 
 
 
 ### installation
--> Feroda linux or RPM package
+-> Fedora linux or RPM package
 ```bash
 #enable copr to mbuild
 sudo dnf copr enable message-beast/mbuild
