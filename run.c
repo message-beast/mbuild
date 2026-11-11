@@ -1,3 +1,4 @@
+#include <asm-generic/errno-base.h>
 #ifndef _POSIX_C_SOURCE
     #define _POSIX_C_SOURCE 200809L
 #endif
@@ -10,8 +11,12 @@
 #include <sys/shm.h>
 #include <sys/mman.h>
 #include <fcntl.h>
+#include <errno.h>
 #define SHM_NAME "/proc_status"
 #include "utils.h"
+
+#define IDLE 0b00000010
+
 
 static inline __attribute__((always_inline, hot, aligned(64))) int run(mexec* exec) {
     int fd = shm_open(SHM_NAME, O_RDWR | O_CREAT, 0644);
@@ -28,8 +33,21 @@ static inline __attribute__((always_inline, hot, aligned(64))) int run(mexec* ex
         statusBuff[1] = '\0';
         abort();
     } else {
-        int status;
-        waitpid(pid, &status, 0);
+        int status = IDLE;
+        pid_t r;
+        do {
+            if (__builtin_expect((r = waitpid(pid, &status, 0)) == -1, 0)) {
+                printf("waiting failed!\n");
+            }
+        } while (r == -1 && errno == EINTR);
+        if (__builtin_expect(r == -1, 0)) {
+            printf("child failed!\n");
+            exit_program(-1);
+        }
+        if (__builtin_expect(!WIFEXITED(status), 0)) {
+            printf("not exited properly!\n");
+            exit_program(-1);
+        }
         if (__builtin_expect(WEXITSTATUS(status) != 0, 0)) {
             fprintf(stderr, "\033[31mprocess failed with status %i\033[0m\n", status);
             goto cleanup;

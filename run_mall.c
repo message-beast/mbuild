@@ -1,3 +1,4 @@
+#include <asm-generic/errno-base.h>
 #ifndef _POSIX_C_SOURCE
     #define _POSIX_C_SOURCE 200809L
 #endif
@@ -12,6 +13,10 @@
 #include <sys/mman.h>
 #include <stdlib.h>
 #include <sys/wait.h>
+#include <errno.h>
+
+#define IDLE 0b00000010
+
 #define SHM_NAME "/dproc_status"
 int runDmall() {
     for (register int i = 0; i < numberOfDBuilds; ++i) {
@@ -43,8 +48,20 @@ int runDmall() {
             status[0] = '1';
             abort();
         } else {
-            int childStatus;
-            waitpid(pid, &childStatus, 0);
+            int childStatus = IDLE;
+            pid_t r;
+            do {
+                if (__builtin_expect((r = waitpid(pid, &childStatus, 0)) == -1, 0)) {
+                    perror("waiting failed!\n");
+                }
+            } while (r == -1 && errno == EINTR);
+            if (__builtin_expect(r == -1, 0)) {
+                perror("child didn't exit!\n");
+                exit_program(-1);
+            }
+            if (__builtin_expect(childStatus != IDLE && !WIFEXITED(childStatus), 0)) {
+                exit_program(-1);
+            }
             if (__builtin_expect(WEXITSTATUS(childStatus) != 0, 0)) {
                 fprintf(stderr, "\033[31mprocess failed with status \033[32m%i\033[0m\n", childStatus);
                 exit_program(-1);
